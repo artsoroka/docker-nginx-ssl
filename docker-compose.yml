@@ -1,0 +1,22 @@
+certs:
+  image: busybox
+  volumes:
+    - ./docker/volumes/certs/.:/nginx-ssl
+
+openssl:
+  build: docker/images/openssl
+  volumes_from:
+    - certs
+
+nginx:
+  build: docker/images/nginx
+  ports:
+    - "80:80"
+    - "80:443"
+  volumes_from:
+    - certs
+  links:
+    - node
+
+node:
+  build: .
