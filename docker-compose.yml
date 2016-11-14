@@ -2,21 +2,32 @@ certs:
   image: busybox
   volumes:
     - ./docker/volumes/certs/.:/nginx-ssl
+    - ./docker/volumes/certbot/public:/var/www 
 
 openssl:
   build: docker/images/openssl
   volumes_from:
     - certs
 
+certbot: 
+  build: docker/images/certbot
+  volumes: 
+    - ./docker/volumes/certbot/letsencrypt:/etc/letsencrypt 
+  volumes_from: 
+    - certs
+  environment:  
+    - DOMAIN_NAME=example.com
+
 nginx:
   build: docker/images/nginx
   ports:
     - "80:80"
-    - "80:443"
+    - "443:443"
   volumes_from:
     - certs
   links:
     - node
+    
 
 node:
   build: .
